@@ -1,0 +1,14 @@
+services:
+  client:
+    build: ./client
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:1337
+    ports:
+      - "3000:3000"
+
+  api:
+    build: ./api
+    environment:
+      CLIENT_URL: http://localhost:3000
+    ports:
+      - "1337:1337"
