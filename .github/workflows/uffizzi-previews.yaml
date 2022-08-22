@@ -1,0 +1,131 @@
+name: Build Images and Handle Uffizzi Previews.
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - staging
+      - qa
+  pull_request:
+    types: [opened,reopened,synchronize,closed]
+
+jobs:
+  build-backend:
+    name: Build and Push `backend`
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }}
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+    steps:
+      - name: Login to Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout git repo
+        uses: actions/checkout@v3
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/foodadvisor-backend
+      - name: Build and Push Image to GitHub Container Registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          context: ./backend
+
+  render-compose-file:
+    name: Render Docker Compose File
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || github.event.action != 'closed' }}
+    needs: 
+      - build-backend
+    outputs:
+      compose-file-cache-key: ${{ steps.hash.outputs.hash }}
+    steps:
+      - name: Checkout git repo
+        uses: actions/checkout@v3
+      - name: Render Compose File
+        run: |
+          BACKEND_IMAGE=$(echo ${{ needs.build-backend.outputs.tags }})
+          export BACKEND_IMAGE
+          # Render simple template from environment variables.
+          envsubst < docker-compose.template.yaml > docker-compose.rendered.yaml
+          cat docker-compose.rendered.yaml
+      - name: Hash Rendered Compose File
+        id: hash
+        run: echo "::set-output name=hash::$(md5sum docker-compose.rendered.yaml | awk '{ print $1 }')"
+      - name: Cache Rendered Compose File
+        uses: actions/cache@v3
+        with:
+          path: docker-compose.rendered.yaml
+          key: ${{ steps.hash.outputs.hash }}
+
+  deploy-uffizzi-preview:
+    name: Use Remote Workflow to Preview on Uffizzi
+    needs: render-compose-file
+    uses: UffizziCloud/preview-action/.github/workflows/reusable.yaml@v2.2.0
+    if: ${{ github.event_name == 'pull_request' && github.event.action != 'closed' }}
+    with:
+      compose-file-cache-key: ${{ needs.render-compose-file.outputs.compose-file-cache-key }}
+      compose-file-cache-path: docker-compose.rendered.yaml
+      username: adam@idyl.tech
+      server: https://app.uffizzi.com
+      project: my-application
+    secrets:
+      password: ${{ secrets.UFFIZZI_PASSWORD }}
+      url-username: admin
+      url-password: ${{ secrets.URL_PASSWORD }}
+      personal-access-token: ${{ secrets.GHCR_ACCESS_TOKEN }}
+    permissions:
+      contents: read
+      pull-requests: write
+
+  delete-uffizzi-preview:
+    name: Use Remote Workflow to Delete an Existing Preview
+    uses: UffizziCloud/preview-action/.github/workflows/reusable.yaml@v2.2.0
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
+    with:
+      compose-file-cache-key: ''
+      compose-file-cache-path: docker-compose.rendered.yaml
+      username: adam@idyl.tech
+      server: https://app.uffizzi.com
+      project: my-application
+    secrets:
+      password: ${{ secrets.UFFIZZI_PASSWORD }}
+    permissions:
+      contents: read
+      pull-requests: write
+
+#  deploy-netlify-preview:
+#    name: Deploy Frontend to Netlify
+#    needs: deploy-uffizzi-preview
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout git repo
+#        uses: actions/checkout@v3
+#      - name: Override environment file.
+#        working-directory: frontend
+#        run: echo -n STRAPI_URL="https://deployment-5112-my-application.app.uffizzi.com/" >> .env
+#        #run: echo STRAPI_URL=${{ needs.deploy-uffizzi-preview.outputs.url }} > frontend/.env
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: 14
+#      - run: npm install
+#        working-directory: frontend
+#      - run: npm run-script build
+#        env:
+#          STRAPI_URL: https://deployment-5112-my-application.app.uffizzi.com/
+#        working-directory: frontend
+#      - uses: nwtgck/actions-netlify@v1.2
+#        env:
+#          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+#          NETLIFY_SITE_ID: 70ab084a-48a1-49f8-bdc0-27d4e7596c30
+#        with:
+#          publish-dir: 'frontend/.nextjs'
+#          alias: ${{ env.BRANCH_NAME }}
