@@ -2,13 +2,42 @@ services:
   client:
     build: ./client
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:1337
+      NEXT_PUBLIC_API_URL: http://api:1337
+      PREVIEW_SECRET: USGmBGempHrQ9Bu5DhNXBFxa
     ports:
       - "3000:3000"
+    depends_on:
+      - api
 
   api:
     build: ./api
     environment:
       CLIENT_URL: http://localhost:3000
+      STRAPI_ADMIN_CLIENT_URL: http://localhost:3000
+      STRAPI_ADMIN_CLIENT_PREVIEW_SECRET: USGmBGempHrQ9Bu5DhNXBFxa
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapipassword
+      NODE_ENV: ${NODE_ENV}
     ports:
       - "1337:1337"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12-alpine
+    platform: linux/amd64
+    environment:
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapipassword
+      POSTGRES_DB: strapi
+    volumes:
+      - strapi-data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+
+volumes:
+  strapi-data:
