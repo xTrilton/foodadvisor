@@ -17,6 +17,8 @@ ADD ./yarn.lock /app
 
 RUN yarn config set network-timeout 600000 -g && yarn install --frozen-lockfile
 
+RUN yarn add pg
+
 ADD . /app
 
 RUN yarn build
