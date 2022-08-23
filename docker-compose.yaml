@@ -2,7 +2,7 @@ services:
   client:
     build: ./client
     environment:
-      NEXT_PUBLIC_API_URL: http://api:1337
+      NEXT_PUBLIC_API_URL: https://deployment-5223-my-application.app.uffizzi.com/
       PREVIEW_SECRET: USGmBGempHrQ9Bu5DhNXBFxa
     ports:
       - "3000:3000"

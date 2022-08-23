@@ -4,4 +4,6 @@ module.exports = ({ env }) => ({
   app: {
     keys: env.array('APP_KEYS', ['testKey1', 'testKey2']),
   },
+  url: env('UFFIZZI_URL', 'http://localhost:1337'),
+  proxy: true,
 });
