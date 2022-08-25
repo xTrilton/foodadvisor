@@ -125,7 +125,7 @@ jobs:
           #NEXT_PUBLIC_API_URL: ${{ needs.deploy-uffizzi-preview.outputs.url }}
       - uses: netlify/actions/cli@master
         with:
-          args: deploy --dir=client
+          args: deploy --dir=client/.next
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          #NETLIFY_SITE_ID: 70ab084a-48a1-49f8-bdc0-27d4e7596c30
+          NETLIFY_SITE_ID: d2dc8ee4-a215-4909-9f76-a2b288a57a32
