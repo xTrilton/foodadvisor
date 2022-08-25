@@ -106,22 +106,22 @@ jobs:
     name: Deploy Frontend to Netlify
     needs: deploy-uffizzi-preview
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
     steps:
       - name: Checkout git repo
         uses: actions/checkout@v3
       - name: Override environment file.
-        working-directory: client
         run: echo -n NEXT_PUBLIC_API_URL=https://deployment-5223-my-application.app.uffizzi.com >> .env
         #run: echo -n NEXT_PUBLIC_API_URL=${{ needs.deploy-uffizzi-preview.outputs.url }} >> .env
       - uses: actions/setup-node@v3
         with:
           node-version: 16
       - run: yarn install --frozen-lockfile
-        working-directory: client
       - uses: netlify/actions/cli@master
-        working-directory: client
         with:
-          args: deploy --build --dir=.next
+          args: deploy --build --dir=client/.next
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: d2dc8ee4-a215-4909-9f76-a2b288a57a32
