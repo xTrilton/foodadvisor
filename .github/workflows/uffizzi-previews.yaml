@@ -110,8 +110,9 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v3
       - name: Override environment file.
-        working-directory: frontend
-        run: echo -n NEXT_PUBLIC_API_URL=${{ needs.deploy-uffizzi-preview.outputs.url }} >> client/.env
+        working-directory: client
+        run: echo -n NEXT_PUBLIC_API_URL=https://deployment-5223-my-application.app.uffizzi.com >> .env
+        #run: echo -n NEXT_PUBLIC_API_URL=${{ needs.deploy-uffizzi-preview.outputs.url }} >> .env
       - uses: actions/setup-node@v3
         with:
           node-version: 16
