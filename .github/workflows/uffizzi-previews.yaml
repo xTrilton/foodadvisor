@@ -118,14 +118,12 @@ jobs:
           node-version: 16
       - run: yarn install --frozen-lockfile
         working-directory: client
-      - run: yarn build
-        working-directory: client
-        env:
-          NEXT_PUBLIC_API_URL: https://deployment-5223-my-application.app.uffizzi.com
-          #NEXT_PUBLIC_API_URL: ${{ needs.deploy-uffizzi-preview.outputs.url }}
       - uses: netlify/actions/cli@master
+        working-directory: client
         with:
-          args: deploy --dir=client/.next
+          args: deploy --build --dir=.next
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: d2dc8ee4-a215-4909-9f76-a2b288a57a32
+          NEXT_PUBLIC_API_URL: https://deployment-5223-my-application.app.uffizzi.com
+          #NEXT_PUBLIC_API_URL: ${{ needs.deploy-uffizzi-preview.outputs.url }}
