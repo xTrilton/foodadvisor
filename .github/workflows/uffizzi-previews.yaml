@@ -116,10 +116,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: yarn build --frozen-lockfile
+      - run: yarn install --frozen-lockfile
+        working-directory: client
+      - run: yarn build
         working-directory: client
         env:
-          NEXT_PUBLIC_API_URL: ${{ needs.deploy-uffizzi-preview.outputs.url }}
+          NEXT_PUBLIC_API_URL: https://deployment-5223-my-application.app.uffizzi.com
+          #NEXT_PUBLIC_API_URL: ${{ needs.deploy-uffizzi-preview.outputs.url }}
       - uses: netlify/actions/cli@master
         with:
           args: deploy --dir=client
