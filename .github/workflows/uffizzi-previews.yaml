@@ -121,7 +121,7 @@ jobs:
         run: |
           echo $NEXT_PUBLIC_API_URL
           printf "[build]\n  base = \"./\"\n  publish = \"./.next/\"\n" >> netlify.toml
-          printf "[context.deploy-preview.environment]\n  NEXT_PUBLIC_API_URL = https://deployment-5381-my-application.app.uffizzi.com" >> netlify.toml
+          printf "[context.deploy-preview.environment]\n  NEXT_PUBLIC_API_URL = 'https://deployment-5381-my-application.app.uffizzi.com'" >> netlify.toml
           yarn install --frozen-lockfile
           npm install netlify-cli --save-dev
 
