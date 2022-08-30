@@ -120,7 +120,7 @@ jobs:
           NETLIFY_SITE_ID: d2dc8ee4-a215-4909-9f76-a2b288a57a32
         run: |
           echo $NEXT_PUBLIC_API_URL
-          printf "[build]\n  base = \"./\"\n  publish = \"./.next/\"\n" >> netlify.toml
+          printf "[build]\n  base = \"./client/\"\n  publish = \"./client/.next/\"\n" >> netlify.toml
           printf "[context.deploy-preview.environment]\n  NEXT_PUBLIC_API_URL = 'https://deployment-5381-my-application.app.uffizzi.com'" >> netlify.toml
           yarn install --frozen-lockfile
           npm install netlify-cli --save-dev
