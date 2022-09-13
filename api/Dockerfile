@@ -15,7 +15,7 @@ ADD ./package.json /app
 
 ADD ./yarn.lock /app
 
-RUN yarn config set network-timeout 600000 -g && yarn install --frozen-lockfile
+RUN yarn config set network-timeout 600000 -g && yarn install
 
 ADD . /app
 
