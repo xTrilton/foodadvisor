@@ -104,8 +104,8 @@ jobs:
       pull-requests: write
       id-token: write
 
-  deploy-netlify-preview:
-    name: Deploy Frontend to Netlify
+  deploy-vercel-preview:
+    name: Deploy Frontend to Vercel
     needs: deploy-uffizzi-preview
     runs-on: ubuntu-latest
     defaults:
@@ -128,4 +128,39 @@ jobs:
 
           vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
           vercel build --token=${{ secrets.VERCEL_TOKEN }}
-          vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }}
+          export OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL")
+
+          echo "OUTPUT=$OUTPUT"
+          echo "::set-output name=VERCEL_URL::$OUTPUT"
+      # If PR event, look for an existing Preview Deployment.
+      - name: Find comment for deployment URL
+        uses: peter-evans/find-comment@v2
+        if: ${{ github.event_name == 'pull_request' }}
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: 'Vercel URL:'
+          direction: last
+      - name: Create comment for Vercel deployment
+        uses: peter-evans/create-or-update-comment@v2
+        if: ${{ steps.find-comment.outputs.comment-id == '' && github.event.action != 'closed' }}
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Frontend Preview deployed at Vercel URL:
+            ${{ steps.netlify-deploy.outputs.VERCEL_URL }}
+          edit-mode: replace
+          reactions: rocket
+      - name: Update comment for Vercel deployment
+        uses: peter-evans/create-or-update-comment@v2
+        if: ${{ steps.find-comment.outputs.comment-id != '' && github.event.action != 'closed' }}
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Frontend Preview redeployed at Vercel URL:
+            ${{ steps.netlify-deploy.outputs.NETLIFY_URL }}
+          edit-mode: replace
+          reactions: '+1'
