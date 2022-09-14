@@ -39,6 +39,11 @@ class MyDocument extends Document {
             src="https://buttons.github.io/buttons.js"
           />
 	  <p>example text</p>
+	  <script
+            dangerouslySetInnerHTML={{
+              __html: `getStrapiURL('/');`,
+            }}
+	  ></script>
           <Main />
           <NextScript />
         </body>
