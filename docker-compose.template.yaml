@@ -1,0 +1,35 @@
+x-uffizzi:
+  ingress:
+    service: backend
+    port: 1337
+
+services:
+  backend:
+    image: "${BACKEND_IMAGE}"
+    environment:
+      STRAPI_ADMIN_CLIENT_PREVIEW_SECRET: USGmBGempHrQ9Bu5DhNXBFxa
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapipassword
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+
+  db:
+    image: postgres:12-alpine
+    platform: linux/amd64
+    environment:
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapipassword
+      POSTGRES_DB: strapi
+    volumes:
+      - strapi-data:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+
+volumes:
+  strapi-data:
