@@ -162,6 +162,6 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             Frontend Preview redeployed at Vercel URL:
-            ${{ steps.vercel-deploy.outputs.NETLIFY_URL }}
+            ${{ steps.vercel-deploy.outputs.VERCEL_URL }}
           edit-mode: replace
           reactions: '+1'
