@@ -38,6 +38,7 @@ class MyDocument extends Document {
             defer
             src="https://buttons.github.io/buttons.js"
           />
+	  <p>example text</p>
           <Main />
           <NextScript />
         </body>
