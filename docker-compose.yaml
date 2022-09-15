@@ -2,7 +2,7 @@ services:
   client:
     build: ./client
     environment:
-      NEXT_PUBLIC_API_URL: https://deployment-5223-my-application.app.uffizzi.com
+      NEXT_PUBLIC_API_URL: http://localhost:1337
       PREVIEW_SECRET: USGmBGempHrQ9Bu5DhNXBFxa
     ports:
       - "3000:3000"
@@ -13,7 +13,8 @@ services:
     build: ./api
     environment:
       CLIENT_URL: http://localhost:3000
-      STRAPI_ADMIN_CLIENT_URL: http://localhost:3000
+      UFFIZZI_URL: http://localhost:1337
+      STRAPI_ADMIN_CLIENT_URL: http://localhost:1337
       STRAPI_ADMIN_CLIENT_PREVIEW_SECRET: USGmBGempHrQ9Bu5DhNXBFxa
       DATABASE_CLIENT: postgres
       DATABASE_HOST: db
