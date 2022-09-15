@@ -19,7 +19,7 @@ RUN yarn config set network-timeout 600000 -g && yarn install
 
 ADD . /app
 
-#RUN yarn build
+RUN yarn build
 
 #RUN yarn seed
 
@@ -27,4 +27,4 @@ EXPOSE 1337
 
 ENTRYPOINT ["/bin/sh", "-c"]
 
-CMD ["yarn build && yarn seed && yarn develop"]
+CMD ["yarn seed && yarn develop"]
