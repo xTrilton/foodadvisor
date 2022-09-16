@@ -18,7 +18,7 @@ const sqlite = require("sqlite3").verbose();
 
 async function dumpSqlite() {
   const db = new sqlite.Database(".tmp/data.db");
-  const sql = fse.readFileSync("./data/dump.sql").toString();
+  const sql = fse.readFileSync("./dump.sql").toString();
 
   await util.promisify(db.exec).bind(db)(sql);
   await util.promisify(db.close).bind(db);
