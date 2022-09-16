@@ -1,4 +1,4 @@
-# FoodAdvisor - Strapi Demo
+# Uffizzi + Vercel - FoodAdvisor Demo
 
 ![FoodAdvisor](./foodadvisor.png)
 
