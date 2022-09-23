@@ -1,6 +1,8 @@
 # Uffizzi + Vercel - FoodAdvisor Demo
 This demo deploys the FoodAdvisor frontend on Vercel and API ([Strapi](https://github.com/strapi/strapi)) on Uffizzi.
 
+[Visit site](https://foodadvisor-omega.vercel.app)
+
 ![FoodAdvisor](./foodadvisor.png)
 
 Welcome to FoodAdvisor, the official Strapi demo application.
